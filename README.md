@@ -1,75 +1,78 @@
 # Serverless-Notifier-Workflow
 
-Overview
+## Overview
 
 This repository contains a demonstration of a serverless application built using AWS services such as S3, API Gateway, Lambda, Step Functions, SNS, and SES. The application is designed to facilitate a notification workflow, allowing users to send emails triggered by certain events.
 
-Functionality
-    SES Configuration (STAGE 1): Configures Amazon Simple Email Service (SES) to enable email functionality.
-    Email Lambda Function (STAGE 2): Integrates a Lambda function to utilize SES for sending emails within the serverless application.
-    State Machine Implementation (STAGE 3): Implements and configures a state machine, serving as the core component orchestrating the workflow.
-    API Gateway Setup (STAGE 4): Establishes an API Gateway along with API endpoints and corresponding Lambda functions to handle incoming requests.
-    Frontend Application (STAGE 5): Develops a static frontend application to interact with the serverless backend, enabling users to trigger notifications and test functionality.
-    Cleanup Procedure (STAGE 6): Provides instructions for cleaning up resources and maintaining account hygiene post-application usage.
+## Functionality
 
-Usage:
-    Prerequisites: Ensure you have an AWS account set up and necessary permissions to create and manage resources.
-    Installation: Clone the repository and follow the setup instructions in the README file.
-    Deployment: Deploy the serverless application using the provided deployment scripts or manually configure resources using AWS Management Console.
-    Testing: Utilize the frontend application to trigger notifications and observe the workflow in action.
-    Cleanup: Follow the provided cleanup instructions to remove resources and avoid unnecessary charges.
+- **SES Configuration (STAGE 1):** Configures Amazon Simple Email Service (SES) to enable email functionality.
+- **Email Lambda Function (STAGE 2):** Integrates a Lambda function to utilize SES for sending emails within the serverless application.
+- **State Machine Implementation (STAGE 3):** Implements and configures a state machine, serving as the core component orchestrating the workflow.
+- **API Gateway Setup (STAGE 4):** Establishes an API Gateway along with API endpoints and corresponding Lambda functions to handle incoming requests.
+- **Frontend Application (STAGE 5):** Develops a static frontend application to interact with the serverless backend, enabling users to trigger notifications and test functionality.
+- **Cleanup Procedure (STAGE 6):** Provides instructions for cleaning up resources and maintaining account hygiene post-application usage.
 
--api_lamda.py :
+## Usage
 
-   import boto3, json, os, decimal
+- **Prerequisites:** Ensure you have an AWS account set up and necessary permissions to create and manage resources.
+- **Installation:** Clone the repository and follow the setup instructions in the README file.
+- **Deployment:** Deploy the serverless application using the provided deployment scripts or manually configure resources using AWS Management Console.
+- **Testing:** Utilize the frontend application to trigger notifications and observe the workflow in action.
+- **Cleanup:** Follow the provided cleanup instructions to remove resources and avoid unnecessary charges.
 
-  SM_ARN = 'YOUR_STATEMACHINE_ARN'
+## `api_lambda.py`
 
-  sm = boto3.client('stepfunctions')
+```python
+import boto3, json, os, decimal
 
-  def lambda_handler(event, context):
-      # Print event data to logs .. 
-      print("Received event: " + json.dumps(event))
+SM_ARN = 'YOUR_STATEMACHINE_ARN'
 
-      # Load data coming from APIGateway
-   data = json.loads(event['body'])
-   data['waitSeconds'] = int(data['waitSeconds'])
+sm = boto3.client('stepfunctions')
+
+def lambda_handler(event, context):
+    # Print event data to logs .. 
+    print("Received event: " + json.dumps(event))
+
+    # Load data coming from APIGateway
+    data = json.loads(event['body'])
+    data['waitSeconds'] = int(data['waitSeconds'])
     
-      # Sanity check that all of the parameters we need have come through from API gateway
-      # Mixture of optional and mandatory ones
-   checks = []
-   checks.append('waitSeconds' in data)
-   checks.append(type(data['waitSeconds']) == int)
-   checks.append('message' in data)
+    # Sanity check that all of the parameters we need have come through from API gateway
+    # Mixture of optional and mandatory ones
+    checks = []
+    checks.append('waitSeconds' in data)
+    checks.append(type(data['waitSeconds']) == int)
+    checks.append('message' in data)
 
-       # if any checks fail, return error to API Gateway to return to client
-   if False in checks:
-       response = {
+    # if any checks fail, return error to API Gateway to return to client
+    if False in checks:
+        response = {
             "statusCode": 400,
-           "headers": {"Access-Control-Allow-Origin":"*"},
+            "headers": {"Access-Control-Allow-Origin":"*"},
             "body": json.dumps( { "Status": "Success", "Reason": "Input failed validation" }, cls=DecimalEncoder )
-       }
-       # If none, start the state machine execution and inform client of 2XX success :)
-   else: 
-       sm.start_execution( stateMachineArn=SM_ARN, input=json.dumps(data, cls=DecimalEncoder) )
-       response = {
+        }
+    # If none, start the state machine execution and inform client of 2XX success :)
+    else: 
+        sm.start_execution( stateMachineArn=SM_ARN, input=json.dumps(data, cls=DecimalEncoder) )
+        response = {
             "statusCode": 200,
-           "headers": {"Access-Control-Allow-Origin":"*"},
-           "body": json.dumps( {"Status": "Success"}, cls=DecimalEncoder )
-       }
-   return response
-    # This is a workaround for: http://bugs.python.org/issue16535
- Solution discussed on this thread https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
- https://stackoverflow.com/questions/1960516/python-json-serialize-a-decimal-object
- Credit goes to the group :)
-lass DecimalEncoder(json.JSONEncoder):
-   def default(self, obj):
-       if isinstance(obj, decimal.Decimal):
+            "headers": {"Access-Control-Allow-Origin":"*"},
+            "body": json.dumps( {"Status": "Success"}, cls=DecimalEncoder )
+        }
+    return response
+
+# This is a workaround for: http://bugs.python.org/issue16535
+# Solution discussed on this thread https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
+# https://stackoverflow.com/questions/1960516/python-json-serialize-a-decimal-object
+# Credit goes to the group :)
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
             return int(obj)
-       return super(DecimalEncoder, self).default(obj)
-   
- 
-**Functionality**:
+        return super(DecimalEncoder, self).default(obj)
+
+- **Functionality**:
   - This code defines a Lambda function named `lambda_handler`, which serves as a backend function for a serverless application.
   - It interacts with a Step Functions state machine and handles requests from API Gateway.
 
@@ -93,18 +96,12 @@ lass DecimalEncoder(json.JSONEncoder):
 - **Credit and References**:
   - Credit is given to a group for discussing and providing solutions related to the Decimal object serialization issue.
   - Links to relevant discussions and resources on Stack Overflow are provided for reference.
- 
 
- -serverless.js:
-
-    
 var API_ENDPOINT = 'https://nkfi4o1jse.execute-api.us-east-1.amazonaws.com/prod/petcuddleotron';
-
 
 var errorDiv = document.getElementById('error-message')
 var successDiv = document.getElementById('success-message')
 var resultsDiv = document.getElementById('results-message')
-
 
 function waitSecondsValue() { return document.getElementById('waitSeconds').value }
 function messageValue() { return document.getElementById('message').value }
@@ -115,7 +112,6 @@ function clearNotifications() {
     resultsDiv.textContent = '';
     successDiv.textContent = '';
 }
-
 
 document.getElementById('emailButton').addEventListener('click', function(e) { sendData(e, 'email'); });
 
@@ -146,6 +142,7 @@ function sendData (e, pref) {
     });
 };
 
+
 - **Functionality**:
   - This JavaScript code handles user interaction on a web page and sends data to an AWS API Gateway endpoint.
 
@@ -175,8 +172,4 @@ function sendData (e, pref) {
 
 - **Error Handling**:
   - It catches and logs any errors that occur during the data sending process.
-
-
-
- 
 
