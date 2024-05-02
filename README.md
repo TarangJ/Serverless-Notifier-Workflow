@@ -3,8 +3,8 @@
 Overview
 
 This repository contains a demonstration of a serverless application built using AWS services such as S3, API Gateway, Lambda, Step Functions, SNS, and SES. The application is designed to facilitate a notification workflow, allowing users to send emails triggered by certain events.
-Functionality
 
+Functionality
     SES Configuration (STAGE 1): Configures Amazon Simple Email Service (SES) to enable email functionality.
     Email Lambda Function (STAGE 2): Integrates a Lambda function to utilize SES for sending emails within the serverless application.
     State Machine Implementation (STAGE 3): Implements and configures a state machine, serving as the core component orchestrating the workflow.
@@ -12,8 +12,7 @@ Functionality
     Frontend Application (STAGE 5): Develops a static frontend application to interact with the serverless backend, enabling users to trigger notifications and test functionality.
     Cleanup Procedure (STAGE 6): Provides instructions for cleaning up resources and maintaining account hygiene post-application usage.
 
-Usage
-
+Usage:
     Prerequisites: Ensure you have an AWS account set up and necessary permissions to create and manage resources.
     Installation: Clone the repository and follow the setup instructions in the README file.
     Deployment: Deploy the serverless application using the provided deployment scripts or manually configure resources using AWS Management Console.
@@ -32,25 +31,25 @@ Usage
       # Print event data to logs .. 
       print("Received event: " + json.dumps(event))
 
-  # Load data coming from APIGateway
+      # Load data coming from APIGateway
    data = json.loads(event['body'])
    data['waitSeconds'] = int(data['waitSeconds'])
     
-  # Sanity check that all of the parameters we need have come through from API gateway
-  # Mixture of optional and mandatory ones
+      # Sanity check that all of the parameters we need have come through from API gateway
+      # Mixture of optional and mandatory ones
    checks = []
    checks.append('waitSeconds' in data)
    checks.append(type(data['waitSeconds']) == int)
    checks.append('message' in data)
 
-   # if any checks fail, return error to API Gateway to return to client
+       # if any checks fail, return error to API Gateway to return to client
    if False in checks:
        response = {
             "statusCode": 400,
            "headers": {"Access-Control-Allow-Origin":"*"},
             "body": json.dumps( { "Status": "Success", "Reason": "Input failed validation" }, cls=DecimalEncoder )
        }
-   # If none, start the state machine execution and inform client of 2XX success :)
+       # If none, start the state machine execution and inform client of 2XX success :)
    else: 
        sm.start_execution( stateMachineArn=SM_ARN, input=json.dumps(data, cls=DecimalEncoder) )
        response = {
@@ -59,7 +58,7 @@ Usage
            "body": json.dumps( {"Status": "Success"}, cls=DecimalEncoder )
        }
    return response
-# This is a workaround for: http://bugs.python.org/issue16535
+    # This is a workaround for: http://bugs.python.org/issue16535
  Solution discussed on this thread https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
  https://stackoverflow.com/questions/1960516/python-json-serialize-a-decimal-object
  Credit goes to the group :)
