@@ -94,4 +94,7 @@ This repository contains a demonstration of a serverless application built using
 ### Error Handling:
 
 - Catches and logs any errors that occur during the data sending process.
+  
+![Screenshot from 2024-05-03 02-29-13](https://github.com/TarangJ/Serverless-Notifier-Workflow/assets/65700353/811daf11-010a-40be-97b7-ff1d28abbe7c)
 
+![Screenshot from 2024-05-03 02-31-24](https://github.com/TarangJ/Serverless-Notifier-Workflow/assets/65700353/adeb7937-c177-4ec1-b6e9-ea33daf44fb2)
