@@ -97,6 +97,10 @@ class DecimalEncoder(json.JSONEncoder):
   - Credit is given to a group for discussing and providing solutions related to the Decimal object serialization issue.
   - Links to relevant discussions and resources on Stack Overflow are provided for reference.
 
+## `serverless.js`
+
+```javascript
+
 var API_ENDPOINT = 'https://nkfi4o1jse.execute-api.us-east-1.amazonaws.com/prod/petcuddleotron';
 
 var errorDiv = document.getElementById('error-message')
@@ -141,6 +145,7 @@ function sendData (e, pref) {
         console.log(err)
     });
 };
+
 
 **Functionality**:
   - This JavaScript code handles user interaction on a web page and sends data to an AWS API Gateway endpoint.
