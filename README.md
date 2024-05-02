@@ -99,8 +99,6 @@ class DecimalEncoder(json.JSONEncoder):
 
 ## `serverless.js`
 
-```javascript
-
 var API_ENDPOINT = 'https://nkfi4o1jse.execute-api.us-east-1.amazonaws.com/prod/petcuddleotron';
 
 var errorDiv = document.getElementById('error-message')
