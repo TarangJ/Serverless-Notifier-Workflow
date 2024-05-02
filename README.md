@@ -72,7 +72,7 @@ class DecimalEncoder(json.JSONEncoder):
             return int(obj)
         return super(DecimalEncoder, self).default(obj)
 
-- **Functionality**:
+ **Functionality**:
   - This code defines a Lambda function named `lambda_handler`, which serves as a backend function for a serverless application.
   - It interacts with a Step Functions state machine and handles requests from API Gateway.
 
@@ -142,8 +142,7 @@ function sendData (e, pref) {
     });
 };
 
-
-- **Functionality**:
+**Functionality**:
   - This JavaScript code handles user interaction on a web page and sends data to an AWS API Gateway endpoint.
 
 - **Endpoint Configuration**:
